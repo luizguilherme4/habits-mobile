@@ -5,6 +5,7 @@ import { Alert, ScrollView, Text, View } from "react-native";
 import dayjs from "dayjs";
 
 import { api } from "../lib/axios";
+import { generateProgressPercentage } from "../utils/generate-progress-percentage";
 import { BackButton } from "../components/BackButton";
 import { ProgressBar } from "../components/ProgressBar";
 import { Checkbox } from "../components/Checkbox";
@@ -34,6 +35,10 @@ export function Habit() {
   const dayOfWeek = parsedDate.format("dddd");
   const dayAndMonth = parsedDate.format("DD/MM");
 
+  const habitsProgress = dayInfo?.possibleHabits.length
+    ? generateProgressPercentage(dayInfo.possibleHabits.length, completedHabits.length)
+    : 0;
+
   async function fetchHabits() {
     try {
       setLoading(true)
@@ -47,6 +52,14 @@ export function Habit() {
       Alert.alert("Ops", "Não foi possível carregar as informações dos hábitos")
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleToggleHabit(habitId: string) {
+    if (completedHabits.includes(habitId)) {
+      setCompletedHabits(prevState => prevState.filter(habit => habit !== habitId));
+    } else {
+      setCompletedHabits(prevState => [...prevState, habitId]);
     }
   }
 
@@ -76,7 +89,7 @@ export function Habit() {
           {dayAndMonth}
         </Text>
 
-        <ProgressBar progress={70} />
+        <ProgressBar progress={habitsProgress} />
 
         <View className="mt-6">
           {
@@ -86,6 +99,7 @@ export function Habit() {
                 key={habit.id}
                 title={habit.title}
                 checked={completedHabits.includes(habit.id)}
+                onPress={() => handleToggleHabit(habit.id)}
               />
             ))
           }
