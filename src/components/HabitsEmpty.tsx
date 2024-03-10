@@ -13,7 +13,7 @@ export function HabitsEmpty() {
         onPress={() => navigate("new")}
       >
         comece cadastrando um.
-    </Text>
+      </Text>
     </Text >
   )
 }
